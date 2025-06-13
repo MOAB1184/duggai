@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DuggAi - AI Project Generator</title>
+    <link rel="stylesheet" href="styles/global.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Custom title bar for frameless window -->
+        <div class="title-bar">
+            <div class="title-bar-drag-area">
+                <div class="app-logo">DuggAi</div>
+            </div>
+            <div class="window-controls">
+                <button id="minimize-btn" class="window-control-btn" title="Minimize">─</button>
+                <button id="maximize-btn" class="window-control-btn" title="Maximize">□</button>
+                <button id="close-btn" class="window-control-btn" title="Close">✕</button>
+            </div>
+        </div>
+
+        <!-- Main content area -->
+        <div class="main-content">
+            <!-- Sidebar navigation -->
+            <div class="sidebar">
+                <nav class="nav-menu">
+                    <a href="#" class="nav-item active" data-view="welcome">
+                        <span class="nav-icon">🏠</span>
+                        <span class="nav-text">Home</span>
+                    </a>
+                    <a href="#" class="nav-item" data-view="projects">
+                        <span class="nav-icon">📂</span>
+                        <span class="nav-text">Projects</span>
+                    </a>
+                    <a href="#" class="nav-item" data-view="templates">
+                        <span class="nav-icon">📋</span>
+                        <span class="nav-text">Templates</span>
+                    </a>
+                    <a href="#" class="nav-item" data-view="settings">
+                        <span class="nav-icon">⚙️</span>
+                        <span class="nav-text">Settings</span>
+                    </a>
+                    <a href="#" class="nav-item" data-view="help">
+                        <span class="nav-icon">❓</span>
+                        <span class="nav-text">Help</span>
+                    </a>
+                </nav>
+            </div>
+
+            <!-- Content views -->
+            <div class="content-container">
+                <!-- Welcome view -->
+                <div class="view active" id="welcome-view">
+                    <div class="welcome-hero">
+                        <h1>Welcome to DuggAi</h1>
+                        <p class="subtitle">From a single prompt to a complete project</p>
+                        <div class="hero-actions">
+                            <button id="new-project-btn" class="btn-primary">New Project</button>
+                            <button id="open-project-btn" class="btn-secondary">Open Existing Project</button>
+                        </div>
+                    </div>
+
+                    <div class="recent-projects">
+                        <h2>Recent Projects</h2>
+                        <div class="projects-grid" id="recent-projects-list">
+                            <!-- Recent projects will be populated here -->
+                            <div class="empty-state">
+                                <p>No recent projects found</p>
+                                <button id="create-first-project-btn" class="btn-secondary">Create Your First Project</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Project Creation view -->
+                <div class="view" id="project-creation-view">
+                    <h1>Create New Project</h1>
+                    <div class="project-creation-container">
+                        <div class="prompt-container glass-panel">
+                            <h2>Describe Your Project</h2>
+                            <p class="subtitle">Tell DuggAi what you want to build, and we'll generate a complete project for you.</p>
+                            <textarea id="project-prompt" class="prompt-input" placeholder="Describe your project in detail. For example: 'Create a personal portfolio website with a dark theme, responsive design, and sections for about me, projects, skills, and contact information.'"></textarea>
+                            
+                            <div class="project-options">
+                                <div class="option-group">
+                                    <label for="project-type">Project Type</label>
+                                    <select id="project-type" class="glass-select">
+                                        <option value="web">Web Application</option>
+                                        <option value="node">Node.js Application</option>
+                                        <option value="react">React Application</option>
+                                        <option value="python">Python Application</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <!-- Folder selection UI -->
+                            <div class="option-group">
+                                <button id="select-folder-btn" class="btn-secondary">Select Project Folder</button>
+                                <span id="selected-folder-path" style="margin-left: 10px; color: #c084fc; font-size: 0.95em;">No folder selected</span>
+                            </div>
+                            
+                            <div class="prompt-actions">
+                                <button id="generate-project-btn" class="btn-primary" disabled>Generate Project</button>
+                                <button id="cancel-creation-btn" class="btn-secondary">Cancel</button>
+                            </div>
+                        </div>
+                        
+                        <div class="prompt-examples glass-panel">
+                            <h3>Example Prompts</h3>
+                            <div class="example-list">
+                                <div class="example-item" data-prompt="Create a to-do list web app with the ability to add, edit, delete, and mark tasks as complete. Include local storage to save tasks.">
+                                    <h4>To-Do List App</h4>
+                                    <p>A simple to-do list application with task management and local storage</p>
+                                </div>
+                                <div class="example-item" data-prompt="Build a weather dashboard that shows current weather and 5-day forecast for a city. Use a weather API and allow users to search for different cities.">
+                                    <h4>Weather Dashboard</h4>
+                                    <p>A weather application showing current conditions and forecasts</p>
+                                </div>
+                                <div class="example-item" data-prompt="Create a personal portfolio website with a dark theme, responsive design, and sections for about me, projects, skills, and contact information.">
+                                    <h4>Portfolio Website</h4>
+                                    <p>A professional portfolio site to showcase your work and skills</p>
+                                </div>
+                                <div class="example-item" data-prompt="Build a recipe finder app that lets users search for recipes by ingredients, dietary restrictions, or meal type. Show recipe cards with images and preparation time.">
+                                    <h4>Recipe Finder</h4>
+                                    <p>An application to discover and save cooking recipes</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Project Generation view -->
+                <div class="view" id="project-generation-view">
+                    <h1>Generating Your Project</h1>
+                    <div class="generation-container glass-panel">
+                        <div class="generation-progress">
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="generation-progress-bar"></div>
+                            </div>
+                            <div class="progress-status" id="generation-status">Initializing...</div>
+                        </div>
+                        
+                        <div class="generation-log">
+                            <div class="log-title">Generation Log</div>
+                            <div class="log-content" id="generation-log-content">
+                                <!-- Log entries will be added here -->
+                            </div>
+                        </div>
+                        
+                        <div class="generation-actions">
+                            <button id="cancel-generation-btn" class="btn-secondary">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Project Overview view -->
+                <div class="view" id="project-overview-view">
+                    <div class="project-header">
+                        <h1 id="project-title">Project Title</h1>
+                        <p id="project-description" class="subtitle">Project description will appear here</p>
+                    </div>
+                    
+                    <div class="project-content">
+                        <div class="project-sidebar glass-panel">
+                            <h3>Project Files</h3>
+                            <div class="file-tree" id="project-file-tree">
+                                <!-- File tree will be populated here -->
+                            </div>
+                        </div>
+                        
+                        <div class="project-main glass-panel">
+                            <div class="file-tabs" id="file-tabs">
+                                <!-- File tabs will be added here -->
+                            </div>
+                            
+                            <div class="file-content" id="file-content">
+                                <!-- File content will be displayed here -->
+                                <div class="empty-state">
+                                    <p>Select a file to view its content</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="project-actions">
+                        <button id="run-project-btn" class="btn-primary">Run Project</button>
+                        <button id="export-project-btn" class="btn-secondary">Export Project</button>
+                        <button id="edit-project-btn" class="btn-secondary">Edit Project</button>
+                        <button id="back-to-home-btn" class="btn-text">Back to Home</button>
+                    </div>
+                </div>
+
+                <!-- Project Running view -->
+                <div class="view" id="project-running-view">
+                    <div class="project-header">
+                        <h1>Running: <span id="running-project-title">Project Title</span></h1>
+                    </div>
+                    
+                    <div class="running-container">
+                        <div class="preview-container glass-panel">
+                            <div class="preview-header">
+                                <h3>Preview</h3>
+                                <div class="preview-controls">
+                                    <button id="refresh-preview-btn" class="btn-icon" title="Refresh">🔄</button>
+                                    <button id="open-external-btn" class="btn-icon" title="Open in Browser">🔗</button>
+                                </div>
+                            </div>
+                            <div class="preview-frame-container">
+                                <iframe id="preview-frame" sandbox="allow-scripts allow-same-origin allow-forms" title="Project Preview"></iframe>
+                            </div>
+                        </div>
+                        
+                        <div class="console-container glass-panel">
+                            <div class="console-header">
+                                <h3>Console Output</h3>
+                                <button id="clear-console-btn" class="btn-icon" title="Clear Console">🗑️</button>
+                            </div>
+                            <div class="console-output" id="console-output">
+                                <!-- Console output will be displayed here -->
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="running-actions">
+                        <button id="stop-project-btn" class="btn-secondary">Stop Project</button>
+                        <button id="back-to-overview-btn" class="btn-text">Back to Overview</button>
+                    </div>
+                </div>
+
+                <!-- Projects view -->
+                <div class="view" id="projects-view">
+                    <h1>Your Projects</h1>
+                    <div class="projects-container">
+                        <div class="projects-grid" id="all-projects-list">
+                            <!-- Projects will be populated here -->
+                            <div class="empty-state">
+                                <p>No projects found</p>
+                                <button id="create-project-btn" class="btn-secondary">Create a Project</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Templates view -->
+                <div class="view" id="templates-view">
+                    <h1>Project Templates</h1>
+                    <div class="templates-container">
+                        <div class="templates-grid">
+                            <div class="template-card glass-panel">
+                                <h3>Web Application</h3>
+                                <p>Create a responsive web application with HTML, CSS, and JavaScript</p>
+                                <button class="btn-secondary use-template-btn" data-template="web">Use Template</button>
+                            </div>
+                            <div class="template-card glass-panel">
+                                <h3>Node.js Application</h3>
+                                <p>Build a server-side application with Node.js</p>
+                                <button class="btn-secondary use-template-btn" data-template="node">Use Template</button>
+                            </div>
+                            <div class="template-card glass-panel">
+                                <h3>React Application</h3>
+                                <p>Develop a modern web application with React</p>
+                                <button class="btn-secondary use-template-btn" data-template="react">Use Template</button>
+                            </div>
+                            <div class="template-card glass-panel">
+                                <h3>Python Application</h3>
+                                <p>Create a Python application with a simple GUI</p>
+                                <button class="btn-secondary use-template-btn" data-template="python">Use Template</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Settings view -->
+                <div class="view" id="settings-view">
+                    <h1>Settings</h1>
+                    <div class="settings-container glass-panel">
+                        <div class="settings-group">
+                            <h3>API Settings</h3>
+                            <div class="setting-item">
+                                <label for="api-key">Gemini API Key</label>
+                                <input type="password" id="api-key" class="glass-input" value="AIzaSyC9h2T7dsxIE6DCPTclWOVYLisYss4b0QQ">
+                                <button id="save-api-key-btn" class="btn-secondary">Save</button>
+                            </div>
+                        </div>
+                        
+                        <div class="settings-group">
+                            <h3>Project Settings</h3>
+                            <div class="setting-item">
+                                <label for="projects-location">Projects Location</label>
+                                <div class="input-with-button">
+                                    <input type="text" id="projects-location" class="glass-input" readonly>
+                                    <button id="change-location-btn" class="btn-secondary">Change</button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="settings-group">
+                            <h3>Appearance</h3>
+                            <div class="setting-item">
+                                <label for="theme-select">Theme</label>
+                                <select id="theme-select" class="glass-select">
+                                    <option value="dark">Dark (Default)</option>
+                                    <option value="darker">Darker</option>
+                                    <option value="light">Light</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="settings-group">
+                            <h3>About</h3>
+                            <div class="about-info">
+                                <p>DuggAi Desktop v1.0.0</p>
+                                <p>© 2025 DuggAi</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Help view -->
+                <div class="view" id="help-view">
+                    <h1>Help & Support</h1>
+                    <div class="help-container">
+                        <div class="help-section glass-panel">
+                            <h3>Getting Started</h3>
+                            <div class="help-content">
+                                <p>DuggAi is an AI-powered application that generates complete, runnable projects from a single text prompt. Here's how to get started:</p>
+                                <ol>
+                                    <li>Click "New Project" on the home screen</li>
+                                    <li>Describe your project in detail</li>
+                                    <li>Select the project type</li>
+                                    <li>Click "Generate Project"</li>
+                                    <li>Wait for the generation to complete</li>
+                                    <li>Explore and run your generated project</li>
+                                </ol>
+                            </div>
+                        </div>
+                        
+                        <div class="help-section glass-panel">
+                            <h3>Writing Effective Prompts</h3>
+                            <div class="help-content">
+                                <p>The quality of your project depends on the clarity and detail of your prompt. Here are some tips:</p>
+                                <ul>
+                                    <li>Be specific about what you want to build</li>
+                                    <li>Include details about functionality, design, and features</li>
+                                    <li>Specify any technologies or frameworks you prefer</li>
+                                    <li>Mention any specific requirements or constraints</li>
+                                </ul>
+                                <p>You can also use the example prompts as a starting point.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="help-section glass-panel">
+                            <h3>FAQ</h3>
+                            <div class="help-content">
+                                <div class="faq-item">
+                                    <h4>What types of projects can I create?</h4>
+                                    <p>DuggAi can generate web applications, Node.js applications, React applications, and Python applications.</p>
+                                </div>
+                                <div class="faq-item">
+                                    <h4>Can I edit the generated code?</h4>
+                                    <p>Yes, you can view and edit all files in the project overview. You can also export the project and edit it in your preferred code editor.</p>
+                                </div>
+                                <div class="faq-item">
+                                    <h4>How do I run my project?</h4>
+                                    <p>Click the "Run Project" button in the project overview to run your project directly in DuggAi.</p>
+                                </div>
+                                <div class="faq-item">
+                                    <h4>Can I export my project?</h4>
+                                    <p>Yes, click the "Export Project" button to save your project to a location of your choice.</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="help-section glass-panel">
+                            <h3>Contact Support</h3>
+                            <div class="help-content">
+                                <p>If you need further assistance, please contact our support team:</p>
+                                <p>Email: support@duggai.com</p>
+                                <p>Website: <a href="https://www.duggai.com/support" class="external-link">www.duggai.com/support</a></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="renderer.js"></script>
+</body>
+</html>
