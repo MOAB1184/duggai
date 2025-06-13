@@ -39,6 +39,19 @@ class AIService {
     this.embeddingService = new EmbeddingService();
     this.webSearch = new WebSearchService();
     this.initialized = false;
+
+    // Track the active project directory
+    this.projectDir = null;
+
+    // Store context to include after planning
+    this.postPlanData = null;
+
+    // Default instructions appended to the first coder prompt
+    this.instructions = [
+      'Use the [FILE] path/to/file.ext marker for every code block.',
+      'Write files only inside the provided project directory.',
+      'Avoid creating duplicate folder names or paths.'
+    ].join(' ');
   }
 
   // Helper for retrying API calls
@@ -429,6 +442,13 @@ class AIService {
       
       // First, generate the project plan
       const plan = await this.generateProjectPlan(prompt, onProgress);
+
+      // Prepare additional context for the first coding prompt
+      this.postPlanData = {
+        instructions: this.instructions,
+        fileStructure: this.getProjectStructure(projectDir),
+        indexerContext: JSON.stringify(await this.analyzeCodebase(), null, 2)
+      };
       
       // Create a Map to store all files
       const allFiles = new Map();
@@ -528,51 +548,62 @@ class AIService {
 
   // Move sanitizeFilePath to be a class method
   sanitizeFilePath(filePath) {
-    // Convert to lowercase for consistency
-    let path = filePath.toLowerCase();
-    
-    // Remove any leading/trailing whitespace
-    path = path.trim();
-    
-    // Replace backslashes with forward slashes
-    path = path.replace(/\\/g, '/');
-    
-    // Remove any leading/trailing slashes
-    path = path.replace(/^\/+|\/+$/g, '');
-    
-    // Remove any double slashes
-    path = path.replace(/\/+/g, '/');
-    
-    // Remove any absolute path components
-    path = path.replace(/^[a-z]:\/|^\/+/i, '');
-    
-    // Fix common file extension issues
-    path = path.replace(/\.(json|md|text|javascript|jsx|tsx|ts)$/i, (match, ext) => {
-      const extMap = {
-        'json': '.json',
-        'md': '.md',
-        'text': '.txt',
-        'javascript': '.js',
-        'jsx': '.jsx',
-        'tsx': '.tsx',
-        'ts': '.ts'
-      };
-      return extMap[ext.toLowerCase()] || match;
-    });
-    
-    // Ensure the path starts with the project root
-    if (!path.startsWith('src/') && !path.startsWith('public/')) {
-      path = `src/${path}`;
+    // Normalize slashes and trim
+    let normalized = filePath.toLowerCase().trim().replace(/\\/g, '/');
+
+    // Remove any surrounding slashes and duplicate separators
+    normalized = normalized.replace(/^\/+|\/+$/g, '').replace(/\/+/g, '/');
+
+    // Remove absolute path components if the project directory is included
+    if (this.projectDir) {
+      const rel = path.relative(this.projectDir, normalized);
+      if (!rel.startsWith('..') && rel !== '') {
+        normalized = rel;
+      }
     }
-    
-    return path;
+
+    // If path contains src/ or public/ deeper in the tree, trim everything before it
+    const srcIndex = normalized.indexOf('src/');
+    const publicIndex = normalized.indexOf('public/');
+    if (srcIndex > 0) {
+      normalized = normalized.slice(srcIndex);
+    } else if (publicIndex > 0) {
+      normalized = normalized.slice(publicIndex);
+    }
+
+    // Fix common file extension issues
+    normalized = normalized.replace(/\.(json|md|text|javascript|jsx|tsx|ts)$/i, (m, ext) => {
+      const extMap = {
+        json: '.json',
+        md: '.md',
+        text: '.txt',
+        javascript: '.js',
+        jsx: '.jsx',
+        tsx: '.tsx',
+        ts: '.ts'
+      };
+      return extMap[ext.toLowerCase()] || m;
+    });
+
+    // Prepend src/ if no top-level folder provided
+    if (!normalized.startsWith('src/') && !normalized.startsWith('public/')) {
+      normalized = `src/${normalized}`;
+    }
+
+    return normalized;
   }
 
   async initialize(projectDir) {
     try {
+      // Persist the active project directory
+      this.projectDir = projectDir;
+
       // Initialize the indexer with the project directory
       this.indexer = new EnhancedIndexer(projectDir);
       await this.indexer.initialize();
+
+      // Reset any context from previous runs
+      this.postPlanData = null;
       return true;
     } catch (error) {
       console.error('Error initializing AIService:', error);
@@ -1656,34 +1687,36 @@ Suggest completions that would be helpful at this position.`;
    * @returns {string} - The formatted prompt for code generation
    */
   buildCoderPrompt(prompt, part, partNumber, totalParts, uri, position, projectDir) {
-    return `You are an expert AI coder. Your task is to generate code for part ${partNumber} of ${totalParts} of a project.
+    let base = `You are an expert AI coder. Your task is to generate code for part ${partNumber} of ${totalParts} of a project.`;
 
-Project Description:
-${prompt}
+    base += `\n\nProject Description:\n${prompt}`;
 
-Part to Implement:
-${part}
+    base += `\n\nPart to Implement:\n${part}`;
 
-Requirements:
-1. Generate complete, working code for this part
-2. Each code block must start with [FILE] path/to/file.ext
-3. Include all necessary imports and dependencies
-4. Add comments explaining complex logic
-5. Follow best practices for the language/framework
-6. Ensure code is well-organized and maintainable
+    if (partNumber === 1 && this.postPlanData) {
+      base += `\n\nInstructions:\n${this.postPlanData.instructions}`;
+      base += `\n\nEntire File Structure:\n${this.postPlanData.fileStructure}`;
+      base += `\n\nIndexer Context:\n${this.postPlanData.indexerContext}`;
+    }
 
-Project Context:
-- Project Directory: ${projectDir}
-- Current File: ${uri}
-- Position: ${position}
+    base += `\n\nRequirements:\n` +
+      `1. Generate complete, working code for this part\n` +
+      `2. Each code block must start with [FILE] path/to/file.ext\n` +
+      `3. Include all necessary imports and dependencies\n` +
+      `4. Add comments explaining complex logic\n` +
+      `5. Follow best practices for the language/framework\n` +
+      `6. Ensure code is well-organized and maintainable`;
 
-Please generate the code for this part, making sure to:
-1. Start each code block with [FILE] followed by the file path
-2. Include all necessary code for the file
-3. Add appropriate comments
-4. Follow the project's existing patterns and conventions
+    base += `\n\nProject Context:\n- Project Directory: ${projectDir}\n- Current File: ${uri}\n- Position: ${position}`;
 
-Remember to output at least one code block with the [FILE] marker.`;
+    base += `\n\nPlease generate the code for this part, making sure to:\n` +
+      `1. Start each code block with [FILE] followed by the file path\n` +
+      `2. Include all necessary code for the file\n` +
+      `3. Add appropriate comments\n` +
+      `4. Follow the project's existing patterns and conventions`;
+
+    base += `\n\nRemember to output at least one code block with the [FILE] marker.`;
+    return base;
   }
 }
 
