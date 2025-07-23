@@ -1,13 +1,7 @@
 // Vercel serverless function for waitlist submissions
 const fetch = require('node-fetch');
 
-const AIRTABLE_API_KEY = process.env.AIRTABLE_API_KEY;
-const BASE_ID = process.env.BASE_ID;
-const TABLE_NAME = 'Waitlist';
-
-function isValidEmail(email) {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-}
+const NOCODEAPI_URL = process.env.NOCODEAPI_URL; // Set this in your Vercel env
 
 module.exports = async (req, res) => {
   if (req.method !== 'POST') {
@@ -26,33 +20,24 @@ module.exports = async (req, res) => {
     }
   }
 
-  console.log('Received email:', email);
-  if (!isValidEmail(email)) {
-    console.log('Invalid email format');
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     res.status(400).json({ error: 'Invalid email' });
     return;
   }
 
-  const airtableUrl = `https://api.airtable.com/v0/${BASE_ID}/${encodeURIComponent(TABLE_NAME)}`;
-  console.log('Airtable URL:', airtableUrl);
-
   try {
-    const airtableRes = await fetch(airtableUrl, {
+    // NoCodeAPI expects an array of arrays for rows
+    const response = await fetch(NOCODEAPI_URL, {
       method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${AIRTABLE_API_KEY}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ fields: { Email: email } })
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify([[email]])
     });
-    const data = await airtableRes.json();
-    console.log('Airtable response:', data);
-    if (!airtableRes.ok) {
+    const data = await response.json();
+    if (!response.ok) {
       throw new Error(JSON.stringify(data));
     }
     res.status(200).json({ success: true });
   } catch (err) {
-    console.error('Airtable error:', err);
     res.status(500).json({ error: 'Failed to save to waitlist.', details: err.message });
   }
 }; 
