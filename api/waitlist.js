@@ -1,8 +1,9 @@
 // Vercel serverless function for waitlist submissions
-const fs = require('fs');
-const path = require('path');
+const fetch = require('node-fetch');
 
-const WAITLIST_FILE = path.join(__dirname, 'waitlist.json');
+const AIRTABLE_API_KEY = process.env.AIRTABLE_API_KEY;
+const BASE_ID = process.env.AIRTABLE_BASE_ID;
+const TABLE_NAME = 'Waitlist';
 
 function isValidEmail(email) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -15,10 +16,14 @@ module.exports = async (req, res) => {
   }
 
   let email = '';
-  try {
-    email = req.body.email || (typeof req.body === 'string' ? JSON.parse(req.body).email : '');
-  } catch {
-    email = '';
+  if (req.body && req.body.email) {
+    email = req.body.email;
+  } else if (typeof req.body === 'string') {
+    try {
+      email = JSON.parse(req.body).email;
+    } catch {
+      email = '';
+    }
   }
 
   if (!isValidEmail(email)) {
@@ -26,22 +31,23 @@ module.exports = async (req, res) => {
     return;
   }
 
-  let waitlist = [];
-  if (fs.existsSync(WAITLIST_FILE)) {
-    try {
-      waitlist = JSON.parse(fs.readFileSync(WAITLIST_FILE, 'utf8'));
-    } catch {
-      waitlist = [];
+  // Add to Airtable
+  try {
+    const airtableRes = await fetch(`https://api.airtable.com/v0/${BASE_ID}/${encodeURIComponent(TABLE_NAME)}`,
+      {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${AIRTABLE_API_KEY}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ fields: { Email: email } })
+      }
+    );
+    if (!airtableRes.ok) {
+      throw new Error('Airtable error');
     }
+    res.status(200).json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to save to waitlist.' });
   }
-
-  if (waitlist.includes(email)) {
-    res.status(200).json({ success: true, message: 'Already on waitlist' });
-    return;
-  }
-
-  waitlist.push(email);
-  fs.writeFileSync(WAITLIST_FILE, JSON.stringify(waitlist, null, 2));
-
-  res.status(200).json({ success: true });
 }; 
