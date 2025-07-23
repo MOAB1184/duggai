@@ -4,8 +4,9 @@
   "description": "The official landing page for DuggAI, the AI that turns prompts into full-stack projects.",
   "main": "index.html",
   "dependencies": {
-    "vercel": "^29.3.2",
-    "fs": "^0.0.1-security"
+    "fs": "^0.0.1-security",
+    "node-fetch": "^2.7.0",
+    "vercel": "^29.3.2"
   },
   "scripts": {
     "start": "vercel dev"
