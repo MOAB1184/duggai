@@ -26,28 +26,33 @@ module.exports = async (req, res) => {
     }
   }
 
+  console.log('Received email:', email);
   if (!isValidEmail(email)) {
+    console.log('Invalid email format');
     res.status(400).json({ error: 'Invalid email' });
     return;
   }
 
-  // Add to Airtable
+  const airtableUrl = `https://api.airtable.com/v0/${BASE_ID}/${encodeURIComponent(TABLE_NAME)}`;
+  console.log('Airtable URL:', airtableUrl);
+
   try {
-    const airtableRes = await fetch(`https://api.airtable.com/v0/${BASE_ID}/${encodeURIComponent(TABLE_NAME)}`,
-      {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${AIRTABLE_API_KEY}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ fields: { Email: email } })
-      }
-    );
+    const airtableRes = await fetch(airtableUrl, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${AIRTABLE_API_KEY}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ fields: { Email: email } })
+    });
+    const data = await airtableRes.json();
+    console.log('Airtable response:', data);
     if (!airtableRes.ok) {
-      throw new Error('Airtable error');
+      throw new Error(JSON.stringify(data));
     }
     res.status(200).json({ success: true });
   } catch (err) {
-    res.status(500).json({ error: 'Failed to save to waitlist.' });
+    console.error('Airtable error:', err);
+    res.status(500).json({ error: 'Failed to save to waitlist.', details: err.message });
   }
 }; 
