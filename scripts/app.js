@@ -67,18 +67,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 4. Waitlist Modal Logic
     const getStartedBtn = document.querySelector('.nav-cta');
+    const joinWaitlistHeroBtn = document.querySelector('.join-waitlist-hero');
     const waitlistModal = document.getElementById('waitlist-modal');
     const waitlistClose = document.getElementById('waitlist-close');
     const waitlistForm = document.getElementById('waitlist-form');
     const waitlistSuccess = document.getElementById('waitlist-success');
     const waitlistEmail = document.getElementById('waitlist-email');
 
+    function openWaitlistModal(e) {
+        if (e) e.preventDefault();
+        waitlistModal.style.display = 'flex';
+        waitlistEmail.focus();
+    }
+
     if (getStartedBtn && waitlistModal) {
-        getStartedBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            waitlistModal.style.display = 'flex';
-            waitlistEmail.focus();
-        });
+        getStartedBtn.addEventListener('click', openWaitlistModal);
+    }
+    if (joinWaitlistHeroBtn && waitlistModal) {
+        joinWaitlistHeroBtn.addEventListener('click', openWaitlistModal);
     }
     if (waitlistClose) {
         waitlistClose.addEventListener('click', function() {

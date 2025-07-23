@@ -2,7 +2,7 @@
 const fetch = require('node-fetch');
 
 const AIRTABLE_API_KEY = process.env.AIRTABLE_API_KEY;
-const BASE_ID = process.env.AIRTABLE_BASE_ID;
+const BASE_ID = process.env.BASE_ID;
 const TABLE_NAME = 'Waitlist';
 
 function isValidEmail(email) {
