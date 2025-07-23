@@ -1,0 +1,489 @@
+/* ---
+   main.css for DuggAI
+   --- */
+
+/* 1. Global Styles & Variables
+   --------------------------------- */
+:root {
+    --dark-bg: #0a0a0a;
+    --primary-bg: #121212;
+    --card-bg: #1a1a1a;
+    --border-color: #2a2a2a;
+    --primary-text: #e0e0e0;
+    --secondary-text: #a0a0a0;
+    --accent-silver: #c0c0c0;
+    --accent-glow: rgba(224, 224, 224, 0.1);
+    --success-color: #4ade80;
+    --fail-color: #f87171;
+    --font-primary: 'Inter', sans-serif;
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    scroll-behavior: smooth;
+    font-size: 16px;
+}
+
+body {
+    background-color: var(--dark-bg);
+    color: var(--primary-text);
+    font-family: var(--font-primary);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+}
+
+.container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+}
+
+a {
+    color: var(--accent-silver);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+a:hover {
+    color: #fff;
+}
+
+h1, h2, h3 {
+    line-height: 1.2;
+    font-weight: 700;
+}
+
+/* 2. Header & Navigation
+   --------------------------------- */
+.site-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 1rem 0;
+    background-color: rgba(10, 10, 10, 0.8);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border-color);
+    z-index: 1000;
+}
+
+.site-header .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.logo a {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--primary-text);
+}
+
+.logo a:hover {
+    color: #fff;
+}
+
+.main-nav {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.main-nav a {
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+.main-nav .nav-cta {
+    background-color: var(--primary-text);
+    color: var(--dark-bg);
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.main-nav .nav-cta:hover {
+    background-color: #fff;
+    color: #000;
+}
+
+/* 3. Hero Section
+   --------------------------------- */
+.hero-section {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    min-height: 100vh;
+    padding: 120px 0 60px;
+    overflow: hidden;
+}
+
+.hero-headline {
+    font-size: 4rem;
+    font-weight: 900;
+    margin-bottom: 1rem;
+    background: linear-gradient(120deg, #fff, #c0c0c0);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.hero-headline .typed-cursor {
+    font-size: 4rem;
+    color: var(--accent-silver);
+}
+
+.hero-subheadline {
+    max-width: 700px;
+    margin: 0 auto 2rem;
+    font-size: 1.25rem;
+    color: var(--secondary-text);
+}
+
+.cta-button {
+    display: inline-block;
+    background: #fff;
+    color: #000;
+    font-size: 1.1rem;
+    font-weight: 600;
+    padding: 0.8rem 2.5rem;
+    border-radius: 8px;
+    border: 1px solid #fff;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+}
+
+.cta-button:hover {
+    background: transparent;
+    color: #fff;
+    box-shadow: 0 0 25px rgba(255, 255, 255, 0.4);
+}
+
+.hero-background-glow {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(192, 192, 192, 0.08) 0%, rgba(192, 192, 192, 0) 60%);
+    transform: translate(-50%, -50%);
+    z-index: -1;
+    animation: pulse 8s infinite ease-in-out;
+}
+
+@keyframes pulse {
+    0% { transform: translate(-50%, -50%) scale(0.9); opacity: 0.7; }
+    50% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
+    100% { transform: translate(-50%, -50%) scale(0.9); opacity: 0.7; }
+}
+
+/* 4. Section Styling
+   --------------------------------- */
+.features-section, .comparison-section {
+    padding: 80px 0;
+    background-color: var(--primary-bg);
+}
+
+.comparison-section {
+    background-color: var(--dark-bg);
+}
+
+.section-title {
+    text-align: center;
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.section-subtitle {
+    text-align: center;
+    font-size: 1.1rem;
+    color: var(--secondary-text);
+    margin-bottom: 4rem;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* 5. Features Section
+   --------------------------------- */
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+}
+
+.feature-card {
+    background-color: var(--card-bg);
+    padding: 2.5rem 2rem;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.feature-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px var(--accent-glow);
+}
+
+.feature-icon {
+    margin-bottom: 1.5rem;
+}
+
+.feature-icon svg {
+    width: 32px;
+    height: 32px;
+    color: var(--accent-silver);
+}
+
+.feature-card h3 {
+    font-size: 1.25rem;
+    margin-bottom: 0.75rem;
+    color: var(--primary-text);
+}
+
+.feature-card p {
+    color: var(--secondary-text);
+}
+
+/* 6. Comparison Section
+   --------------------------------- */
+.comparison-table {
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.table-header, .table-row {
+    display: grid;
+    grid-template-columns: 2fr repeat(3, 1fr);
+    align-items: center;
+    padding: 1.5rem 2rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.table-row:last-child {
+    border-bottom: none;
+}
+
+.table-header {
+    background-color: rgba(255, 255, 255, 0.03);
+    font-weight: 600;
+    color: var(--primary-text);
+}
+
+.competitor-logo {
+    text-align: center;
+    font-weight: 500;
+}
+
+.duggai-logo {
+    font-weight: 700;
+    color: #fff;
+}
+
+.table-row div {
+    font-size: 1rem;
+    color: var(--secondary-text);
+    text-align: center;
+}
+
+.table-row div:first-child {
+    text-align: left;
+    font-weight: 500;
+    color: var(--primary-text);
+}
+
+.check-mark, .check-mark-faded {
+    font-size: 1.5rem;
+    color: var(--success-color);
+}
+.check-mark-faded {
+    opacity: 0.6;
+}
+
+.x-mark {
+    font-size: 1.5rem;
+    color: var(--fail-color);
+}
+.table-row small {
+    display: block;
+    font-size: 0.75rem;
+    opacity: 0.7;
+    margin-top: -4px;
+}
+
+/* 7. Footer
+   --------------------------------- */
+.site-footer-bottom {
+    padding: 2rem 0;
+    background-color: var(--dark-bg);
+    border-top: 1px solid var(--border-color);
+}
+
+.site-footer-bottom .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--secondary-text);
+    font-size: 0.9rem;
+}
+
+.footer-credit a {
+    font-weight: 500;
+}
+
+/* 8. Animations & Responsiveness
+   --------------------------------- */
+.animate-on-scroll {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+}
+
+.animate-on-scroll.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Waitlist Modal Styles */
+.waitlist-modal {
+  position: fixed;
+  z-index: 2000;
+  left: 0; top: 0; right: 0; bottom: 0;
+  width: 100vw; height: 100vh;
+  background: rgba(10,10,10,0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.3s;
+}
+.waitlist-modal-content {
+  background: var(--card-bg);
+  color: var(--primary-text);
+  border-radius: 16px;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.7);
+  padding: 2.5rem 2rem 2rem 2rem;
+  max-width: 95vw;
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+  position: relative;
+  border: 1px solid var(--border-color);
+}
+.waitlist-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  color: var(--secondary-text);
+  font-size: 2rem;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+.waitlist-close:hover {
+  color: #fff;
+}
+#waitlist-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+#waitlist-email {
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
+  border: 1px solid var(--border-color);
+  background: var(--primary-bg);
+  color: var(--primary-text);
+  font-size: 1rem;
+  outline: none;
+  transition: border 0.2s;
+}
+#waitlist-email:focus {
+  border-color: var(--accent-silver);
+}
+#waitlist-form button[type="submit"] {
+  background: var(--primary-text);
+  color: var(--dark-bg);
+  font-weight: 600;
+  border: none;
+  border-radius: 6px;
+  padding: 0.75rem 0;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+#waitlist-form button[type="submit"]:hover {
+  background: #fff;
+  color: #000;
+}
+@media (max-width: 480px) {
+  .waitlist-modal-content {
+    padding: 1.5rem 0.5rem 1.5rem 0.5rem;
+    max-width: 95vw;
+  }
+}
+/* End Waitlist Modal Styles */
+
+@media (max-width: 768px) {
+    html { font-size: 14px; }
+
+    .hero-headline { font-size: 3rem; }
+    .hero-headline .typed-cursor { font-size: 3rem; }
+    .hero-subheadline { font-size: 1.1rem; }
+    
+    .site-header .container { flex-direction: column; gap: 1rem; }
+    .main-nav { margin-top: 1rem; }
+    
+    .section-title { font-size: 2rem; }
+
+    .comparison-table { font-size: 0.9rem; }
+    .table-header, .table-row {
+        grid-template-columns: 1.5fr repeat(3, 1fr);
+        padding: 1rem 1.5rem;
+    }
+
+    .site-footer-bottom .container { flex-direction: column; gap: 0.5rem; }
+}
+
+@media (max-width: 480px) {
+    .container { padding: 0 1rem; }
+
+    .hero-headline { font-size: 2.2rem; }
+    .hero-headline .typed-cursor { font-size: 2.2rem; }
+
+    .main-nav { gap: 1rem; }
+    .main-nav a { font-size: 0.9rem; }
+    
+    .comparison-table {
+        border-radius: 0;
+        border-left: none;
+        border-right: none;
+    }
+    .table-header, .table-row {
+        padding: 1rem 0.5rem;
+        gap: 0.5rem;
+        grid-template-columns: 1.5fr repeat(3, 1fr);
+    }
+    .check-mark, .x-mark, .check-mark-faded { font-size: 1.2rem; }
+}

@@ -1,0 +1,21 @@
+{
+  "name": "duggai-landing-page",
+  "version": "1.0.0",
+  "description": "The official landing page for DuggAI, the AI that turns prompts into full-stack projects.",
+  "main": "index.html",
+  "dependencies": {
+    "vercel": "^29.3.2",
+    "fs": "^0.0.1-security"
+  },
+  "scripts": {
+    "start": "vercel dev"
+  },
+  "author": "DuggAI",
+  "license": "ISC",
+  "keywords": [
+    "ai",
+    "code-generation",
+    "development",
+    "landing-page"
+  ]
+}
