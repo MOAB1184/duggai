@@ -32,10 +32,11 @@ module.exports = async (req, res) => {
   console.log('NoCodeAPI URL:', NOCODEAPI_URL);
 
   try {
+    // Always send ['a', email] to match [Name, Email] columns
     const response = await fetch(NOCODEAPI_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify([[email]])
+      body: JSON.stringify([['a', email]])
     });
     const data = await response.json();
     console.log('NoCodeAPI response:', data);
